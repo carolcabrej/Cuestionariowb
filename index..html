@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de IA en Salud y Seguridad Ocupacional 2025</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            max-width: 700px; /* Slightly wider */
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .question-text {
+            font-size: 1.5rem; /* Larger font size */
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1a202c; /* Darker text for contrast */
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* Space between options */
+            margin-bottom: 2rem;
+        }
+        .option-button {
+            background-color: #edf2f7; /* Lighter option background */
+            color: #2d3748;
+            padding: 1rem 1.25rem; /* Generous padding */
+            border-radius: 0.75rem; /* Rounded corners for options */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: left;
+            border: 2px solid transparent;
+            font-weight: 500;
+        }
+        .option-button:hover:not(.selected) {
+            background-color: #e2e8f0; /* Subtle hover effect */
+        }
+        .option-button.selected {
+            background-color: #4299e1; /* Blue for selected */
+            color: #ffffff;
+            border-color: #2b6cb0; /* Darker blue border */
+            transform: translateY(-2px); /* Slight lift */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem; /* Space between buttons */
+        }
+        .nav-button {
+            flex: 1; /* Make buttons take equal width */
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1rem;
+        }
+        .nav-button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .nav-button.next {
+            background-color: #48bb78; /* Green for next/finish */
+            color: #ffffff;
+            border: none;
+        }
+        .nav-button.next:hover:not(:disabled) {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+        .nav-button.prev {
+            background-color: #a0aec0; /* Gray for previous */
+            color: #ffffff;
+            border: none;
+        }
+        .nav-button.prev:hover:not(:disabled) {
+            background-color: #718096;
+            transform: translateY(-2px);
+        }
+        .score-container {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c5282;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .restart-button {
+            background-color: #e53e3e; /* Red for restart */
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1.1rem;
+            border: none;
+        }
+        .restart-button:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+        }
+        .question-counter {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+                margin: 10px; /* Add margin on smaller screens */
+            }
+            .question-text {
+                font-size: 1.25rem;
+            }
+            .option-button {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+            .nav-button {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+            .score-container {
+                font-size: 1.5rem;
+            }
+            .restart-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-orange-400 to-sky-400">
+    <div id="quiz-app" class="quiz-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Cuestionario de IA en Salud y Seguridad Ocupacional 2025</h1>
+        <p class="text-gray-600 text-center mb-6">Evalúa tus conocimientos sobre las implementaciones de la Inteligencia Artificial en la SSO para el año 2025.</p>
+
+        <div id="quiz-section">
+            <p id="question-counter" class="question-counter"></p>
+            <p id="question-text" class="question-text"></p>
+            <div id="options-container" class="options-container">
+                <!-- Options will be loaded here by JavaScript -->
+            </div>
+            <div class="navigation-buttons">
+                <button id="prev-button" class="nav-button prev" disabled>Anterior</button>
+                <button id="next-button" class="nav-button next" disabled>Siguiente</button>
+            </div>
+        </div>
+
+        <div id="result-section" class="hidden">
+            <p id="score-text" class="score-container"></p>
+            <p id="feedback-text" class="text-xl text-gray-700 mb-8"></p>
+            <button id="restart-button" class="restart-button">Reiniciar Cuestionario</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Cuál es el cambio fundamental que la Inteligencia Artificial está redefiniendo en la Salud y Seguridad Ocupacional (SSO) en 2025?",
+                options: [
+                    "De una disciplina reactiva a una proactiva.",
+                    "De un enfoque manual a uno totalmente automatizado.",
+                    "De una gestión de riesgos por incidentes a una por cumplimiento.",
+                    "De una disciplina centrada en la auditoría a una centrada en la intervención."
+                ],
+                correctAnswer: "De una disciplina reactiva a una proactiva."
+            },
+            {
+                question: "¿Qué tipo de datos biométricos es capaz de rastrear la BAND V2 de SlateSafety según el informe?",
+                options: [
+                    "Niveles de glucosa y presión arterial.",
+                    "Frecuencia cardíaca, temperatura central y niveles de hidratación.",
+                    "Patrones de sueño y actividad cerebral.",
+                    "Nivel de estrés y calidad del aire."
+                ],
+                correctAnswer: "Frecuencia cardíaca, temperatura central y niveles de hidratación."
+            },
+            {
+                question: "¿Qué porcentaje de reducción de incidentes logró un cliente de Protex AI en logística al utilizar análisis predictivo?",
+                options: [
+                    "10%",
+                    "25%",
+                    "50%",
+                    "75%"
+                ],
+                correctAnswer: "25%"
+            },
+            {
+                question: "¿Qué capacidad única permite la visión por computadora para el cumplimiento del EPP, según el informe?",
+                options: [
+                    "Permite a los trabajadores auto-inspeccionar su equipo.",
+                    "Proporciona detección y alertas en tiempo real sobre el incumplimiento del EPP.",
+                    "Genera automáticamente pedidos de nuevos equipos de protección.",
+                    "Calcula la vida útil restante del EPP."
+                ],
+                correctAnswer: "Proporciona detección y alertas en tiempo real sobre el incumplimiento del EPP."
+            },
+            {
+                question: "Según el Foro Económico Mundial, ¿cuántos nuevos empleos se espera que cree la IA a nivel mundial para 2025?",
+                options: [
+                    "75 millones",
+                    "58 millones",
+                    "133 millones",
+                    "200 millones"
+                ],
+                correctAnswer: "133 millones"
+            },
+            {
+                question: "¿Qué tipo de monitoreo continuo realizan los chalecos y bandas inteligentes, ofreciendo advertencias tempranas de sobreesfuerzo o posibles problemas de salud?",
+                options: [
+                    "Monitoreo de la calidad del aire.",
+                    "Monitoreo de la ubicación GPS.",
+                    "Monitoreo de signos vitales como frecuencia cardíaca y temperatura corporal, y niveles de fatiga.",
+                    "Monitoreo del uso del equipo de protección personal."
+                ],
+                correctAnswer: "Monitoreo de signos vitales como frecuencia cardíaca y temperatura corporal, y niveles de fatiga."
+            },
+            {
+                question: "¿Qué tipo de datos analiza la IA en el análisis predictivo para identificar probabilidades estadísticas de incidentes futuros?",
+                options: [
+                    "Datos de encuestas de satisfacción del empleado.",
+                    "Datos históricos y en tiempo real, como la frecuencia de accidentes y violaciones de seguridad.",
+                    "Datos de asistencia y horarios de trabajo.",
+                    "Datos de rendimiento de ventas y producción."
+                ],
+                correctAnswer: "Datos históricos y en tiempo real, como la frecuencia de accidentes y violaciones de seguridad."
+            },
+            {
+                question: "¿Qué impacto tiene la visión por computadora en las inspecciones de seguridad tradicionales, que son propensas a errores y retrasos?",
+                options: [
+                    "Aumenta la necesidad de supervisión humana.",
+                    "Reemplaza completamente la necesidad de inspecciones manuales.",
+                    "Reduce el error humano y la carga de recursos al automatizar la detección del uso de EPP.",
+                    "No tiene impacto significativo, solo complementa."
+                ],
+                correctAnswer: "Reduce el error humano y la carga de recursos al automatizar la detección del uso de EPP."
+            },
+            {
+                question: "¿Qué rol laboral emergente se encarga de supervisar la interacción entre humanos y máquinas para garantizar una colaboración efectiva y mejorar la productividad?",
+                options: [
+                    "Analista de Datos.",
+                    "Programador de IA.",
+                    "Gerente de Equipos Humano-Máquina.",
+                    "Especialista en Ética y Políticas de IA."
+                ],
+                correctAnswer: "Gerente de Equipos Humano-Máquina."
+            },
+            {
+                question: "¿Cuál es uno de los impulsores clave para la adopción de la IA en SSO, según el informe?",
+                options: [
+                    "La necesidad de aumentar el error humano.",
+                    "La necesidad de reducir el cumplimiento normativo.",
+                    "La necesidad de reducir el error humano y mejorar el cumplimiento normativo.",
+                    "La necesidad de incrementar el tiempo de inactividad."
+                ],
+                correctAnswer: "La necesidad de reducir el error humano y mejorar el cumplimiento normativo."
+            },
+            {
+                question: "¿Cómo contribuyen los exoesqueletos mejorados con IA a la seguridad ocupacional?",
+                options: [
+                    "Monitorean los signos vitales de los trabajadores de forma remota.",
+                    "Optimizan el soporte de movimiento al analizar el movimiento del usuario y ajustar la asistencia para minimizar la fatiga y prevenir lesiones.",
+                    "Detectan la presencia de gases tóxicos en el ambiente.",
+                    "Identifican áreas de alto riesgo en plantas de producción."
+                ],
+                correctAnswer: "Optimizan el soporte de movimiento al analizar el movimiento del usuario y ajustar la asistencia para minimizar la fatiga y prevenir lesiones."
+            },
+            {
+                question: "Además de la reducción de incidentes, ¿qué otro beneficio significativo ofrece el análisis predictivo a las empresas de logística, como la agilización del proceso de auditoría?",
+                options: [
+                    "Incrementa los costos operativos.",
+                    "Aumenta el riesgo de multas y sanciones.",
+                    "Reduce el tiempo de preparación de auditorías y el riesgo de multas.",
+                    "Ralentiza la toma de decisiones."
+                ],
+                correctAnswer: "Reduce el tiempo de preparación de auditorías y el riesgo de multas."
+            },
+            {
+                question: "¿Qué tipo de industrias están liderando la adopción de tecnología wearable de seguridad, según el informe?",
+                options: [
+                    "Industrias de servicios y educación.",
+                    "Industrias de manufactura, construcción y minería.",
+                    "Industrias de tecnología y finanzas.",
+                    "Industrias agrícolas y pesqueras."
+                ],
+                correctAnswer: "Industrias de manufactura, construcción y minería."
+            },
+            {
+                question: "Según el informe, ¿qué prima salarial sustancial obtienen los trabajadores con habilidades en IA, en comparación con el año pasado?",
+                options: [
+                    "10%",
+                    "25%",
+                    "35%",
+                    "56%"
+                ],
+                correctAnswer: "56%"
+            },
+            {
+                question: "¿Cuál es uno de los desafíos y consideraciones éticas más importantes de la IA en SSO, que requiere una protección robusta de los datos personales?",
+                options: [
+                    "La dificultad de integrar nuevos softwares.",
+                    "Preocupaciones por la privacidad de los datos.",
+                    "La baja adopción por parte de los trabajadores.",
+                    "El alto costo de implementación inicial."
+                ],
+                correctAnswer: "Preocupaciones por la privacidad de los datos."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null); // Stores the index of the selected option
+        let selectedOptionElement = null; // Reference to the currently selected option button
+
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const scoreText = document.getElementById('score-text');
+        const feedbackText = document.getElementById('feedback-text');
+        const restartButton = document.getElementById('restart-button');
+
+        // Function to load a question
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionCounter.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+            questionText.textContent = question.question;
+            optionsContainer.innerHTML = ''; // Clear previous options
+            selectedOptionElement = null; // Reset selected option element
+
+            const alphabet = ['a', 'b', 'c', 'd']; // Array for prefixes
+
+            question.options.forEach((option, index) => {
+                const optionButton = document.createElement('button');
+                optionButton.textContent = `${alphabet[index]}. ${option}`; // Add prefix
+                optionButton.classList.add('option-button', 'rounded-xl', 'transition-all');
+                optionButton.setAttribute('data-index', index); // Store index for easy lookup
+
+                // If user has answered this question before, pre-select it
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionButton.classList.add('selected');
+                    selectedOptionElement = optionButton;
+                }
+
+                optionButton.addEventListener('click', () => selectOption(optionButton, index));
+                optionsContainer.appendChild(optionButton);
+            });
+
+            // Update button states
+            updateNavigationButtons();
+            // Enable next button if an answer is already selected for the current question
+            if (userAnswers[currentQuestionIndex] !== null) {
+                nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
+            }
+        }
+
+        // Function to select an option
+        function selectOption(button, index) {
+            // Deselect previous if any
+            if (selectedOptionElement) {
+                selectedOptionElement.classList.remove('selected');
+            }
+            // Select new
+            button.classList.add('selected');
+            selectedOptionElement = button;
+            userAnswers[currentQuestionIndex] = index; // Store the index of the selected option
+            nextButton.disabled = false; // Enable next button after selection
+        }
+
+        // Function to update navigation button states
+        function updateNavigationButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            if (currentQuestionIndex === questions.length - 1) {
+                nextButton.textContent = 'Ver Resultados';
+            } else {
+                nextButton.textContent = 'Siguiente';
+            }
+        }
+
+        // Event listener for Next button
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                // End of quiz
+                showResults();
+            }
+        });
+
+        // Event listener for Previous button
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        // Function to show quiz results
+        function showResults() {
+            quizSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+
+            let correctCount = 0;
+            for (let i = 0; i < questions.length; i++) {
+                const userAnswerIndex = userAnswers[i];
+                if (userAnswerIndex !== null) {
+                    const selectedOptionText = questions[i].options[userAnswerIndex];
+                    if (selectedOptionText === questions[i].correctAnswer) {
+                        correctCount++;
+                    }
+                }
+            }
+
+            scoreText.textContent = `Obtuviste ${correctCount} de ${questions.length} respuestas correctas.`;
+
+            if (correctCount >= 12) {
+                feedbackText.textContent = "¡Excelente trabajo! Tienes un gran conocimiento sobre la IA en Salud y Seguridad Ocupacional.";
+                feedbackText.classList.add('text-green-600');
+                feedbackText.classList.remove('text-red-600', 'text-orange-600');
+            } else if (correctCount >= 8) {
+                feedbackText.textContent = "¡Muy bien! Estás en el camino correcto. Sigue aprendiendo para mejorar tu puntuación.";
+                feedbackText.classList.add('text-orange-600');
+                feedbackText.classList.remove('text-green-600', 'text-red-600');
+            } else {
+                feedbackText.textContent = "Necesitas repasar algunos conceptos. ¡No te rindas y vuelve a intentarlo!";
+                feedbackText.classList.add('text-red-600');
+                feedbackText.classList.remove('text-green-600', 'text-orange-600');
+            }
+        }
+
+        // Event listener for Restart button
+        restartButton.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            loadQuestion();
+        });
+
+        // Initial load
+        loadQuestion();
+    </script>
+</body>
+</html>
